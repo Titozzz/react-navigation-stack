@@ -8,9 +8,10 @@ import {
   View,
   I18nManager,
   MaskedViewIOS,
+  SafeAreaView,
 } from 'react-native';
 
-import { SafeAreaView, withOrientation } from 'react-navigation';
+import { withOrientation } from 'react-navigation';
 
 import HeaderTitle from './HeaderTitle';
 import HeaderBackButton from './HeaderBackButton';
@@ -596,7 +597,6 @@ class Header extends React.PureComponent {
       options.headerTransparent
         ? styles.transparentContainer
         : styles.container,
-      { height: appBarHeight },
       safeHeaderStyle,
     ];
 
@@ -615,9 +615,11 @@ class Header extends React.PureComponent {
             : null,
         ]}
       >
-        <SafeAreaView forceInset={forceInset} style={containerStyles}>
-          {background}
-          <View style={styles.flexOne}>{appBar}</View>
+        <SafeAreaView style={containerStyles}>
+          <View style={StyleSheet.absoluteFill}>
+            {options.headerBackground}
+          </View>
+          <View style={{ height: appBarHeight }}>{appBar}</View>
         </SafeAreaView>
       </Animated.View>
     );
