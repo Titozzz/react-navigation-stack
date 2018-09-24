@@ -18,10 +18,10 @@ import {
   withOrientation,
   NavigationProvider,
 } from 'react-navigation';
+import { ScreenContainer } from 'react-native-screens';
 
 import Card from './StackViewCard';
 import Header from '../Header/Header';
-import { ScreenContainer } from './screens';
 
 import TransitionConfigs from './StackViewTransitionConfigs';
 import { supportsImprovedSpringAnimation } from '../../utils/ReactNativeFeatures';
@@ -440,7 +440,11 @@ class StackViewLayout extends React.Component {
     if (headerMode === 'float') {
       const { scene } = this.props.transitionProps;
       floatingHeader = (
-        <View pointerEvents="box-none" onLayout={this._onFloatingHeaderLayout}>
+        <View
+          style={styles.floatingHeader}
+          pointerEvents="box-none"
+          onLayout={this._onFloatingHeaderLayout}
+        >
           {this._renderHeader(scene, headerMode)}
         </View>
       );
@@ -493,7 +497,7 @@ class StackViewLayout extends React.Component {
           Platform.OS === 'ios'
         ) {
           console.warn(
-            `headerTransitionPreset with the value 'ui-kit' is incompatible with headerLayoutPreset 'left'`
+            `headerTransitionPreset with the value 'uikit' is incompatible with headerLayoutPreset 'left'`
           );
         }
       }
@@ -595,22 +599,21 @@ class StackViewLayout extends React.Component {
       screenInterpolator &&
       screenInterpolator({ ...this.props.transitionProps, scene });
 
-    // If this screen has "header" set to `null` in it's navigation options, but
-    // it exists in a stack with headerMode float, add a negative margin to
-    // compensate for the hidden header
+    // When using a floating header, we need to add some top
+    // padding on the scene.
     const { options } = scene.descriptor;
     const hasHeader = options.header !== null;
     const headerMode = this._getHeaderMode();
-    let marginTop = 0;
-    if (!hasHeader && headerMode === 'float') {
-      marginTop = -this.state.floatingHeaderHeight;
+    let paddingTop = 0;
+    if (hasHeader && headerMode === 'float' && !options.headerTransparent) {
+      paddingTop = this.state.floatingHeaderHeight;
     }
 
     return (
       <Card
         {...this.props.transitionProps}
         key={`card_${scene.key}`}
-        style={[style, { marginTop }, this.props.cardStyle]}
+        style={[style, { paddingTop }, this.props.cardStyle]}
         scene={scene}
       >
         {this._renderInnerScene(scene)}
@@ -630,6 +633,12 @@ const styles = StyleSheet.create({
   },
   scenes: {
     flex: 1,
+  },
+  floatingHeader: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
   },
 });
 

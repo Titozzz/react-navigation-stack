@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
-import { Screen } from './screens';
+import { Screen } from 'react-native-screens';
 import createPointerEventsContainer from './createPointerEventsContainer';
 
 const EPS = 1e-5;
@@ -9,7 +9,6 @@ function getAccessibilityProps(isActive) {
   if (Platform.OS === 'ios') {
     return {
       accessibilityElementsHidden: !isActive,
-      accessible: isActive,
     };
   } else if (Platform.OS === 'android') {
     return {
@@ -33,11 +32,13 @@ class Card extends React.Component {
       scene: { index, isActive },
     } = this.props;
 
-    const active = position.interpolate({
-      inputRange: [index, index + 1 - EPS, index + 1],
-      outputRange: [1, 1, 0],
-      extrapolate: 'clamp',
-    });
+    const active = isActive
+      ? 1
+      : position.interpolate({
+          inputRange: [index, index + 1 - EPS, index + 1],
+          outputRange: [1, 1, 0],
+          extrapolate: 'clamp',
+        });
 
     return (
       <Screen
